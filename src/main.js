@@ -28,18 +28,16 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.target.set(250, 50, 250);
 camera.lookAt(controls.target);
 
-const ground = new Ground();
-scene.add(ground);
 
 // Create set of boxes
-const voxelSize = 10;
+/*const voxelSize = 20;
 
 const darkGroundColors = [0x291C0A, 0x1F1508, 0x1C1306, 0x1F1406, 0x1C1306];
 const grassColors = [0x3CA128, 0x39A623, 0x41AB2C];
 
 for (let d = 0; d < 5; d++) {
-  for (let x = 0; x < 50; x++) {
-    for (let z = 0; z < 50; z++) {
+  for (let x = 0; x < 25; x++) {
+    for (let z = 0; z < 25; z++) {
 
       if (Math.random() < 0.2) {
         continue;
@@ -54,8 +52,8 @@ for (let d = 0; d < 5; d++) {
 }
 
 for (let g = 0; g < 3; g++) {
-  for (let x = 0; x < 50; x++) {
-    for (let z = 0; z < 50; z++) {
+  for (let x = 0; x < 25; x++) {
+    for (let z = 0; z < 25; z++) {
 
       if (Math.random() < ((g * 2) / 10)) {
         continue;
@@ -68,7 +66,7 @@ for (let g = 0; g < 3; g++) {
     }
   }
 }
-
+*/
 const light = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.5);
 
 const shadowLight = new THREE.DirectionalLight(0xffffff, 0.8);
@@ -86,6 +84,61 @@ scene.add(light);
 scene.add(shadowLight);
 
 createDebugAxes(scene);
+
+import TileRenderer from './view/renderers/tile-renderer';
+import Tile from './world/components/tile';
+import Soil from './world/nature/soil';
+import Grass from './world/nature/soil/grass';
+
+const mX = 30;
+const mY = 30;
+
+const heightMap = new Array(mX).map(() => new Array(mY).fill(0));
+
+// let x = 0;
+// let y = 0;
+// for (let i = 0; i < mX * mY; i++) {
+//   heightMap[]
+// }
+
+import RealmGenerator from './world/generators/realm-generator';
+
+const rm = new RealmGenerator(Math.ceil(Math.sqrt(mX)), 0.1);
+rm.generate();
+console.log(rm);
+
+
+//let vz = 0;
+//const vx = new Array(mX).fill(0);
+
+for (let x = 0; x < mX; x++) {
+  for (let z = 0; z < mY; z++) {
+
+    /*if (x > 0 && x < (mX - 1)) {
+      vx[x] = Math.round(vx[x] + (Math.random() * 2 - 1));
+
+      if (vx[x] < 0) {
+        vx[x] = 0;
+      }
+    }
+    else {
+      console.log(`skipped ${x}`)
+    }
+    vz = Math.round(vz + (Math.random() * 2 - 1));
+    if (vz < 0) {
+      vz = 0;
+    }*/
+
+    const tile = new Tile(x, z);
+
+    tile.add(new Soil(rm.get(x, z)));
+    tile.add(new Grass(1));
+
+    const tr = new TileRenderer(tile);
+
+    tr.addTo(scene);
+  }
+}
 
 function render() {
   requestAnimationFrame( render );
